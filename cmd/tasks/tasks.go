@@ -46,6 +46,11 @@ func NewApp() App {
 }
 
 func (a *App) Execute(args []string) {
+	if len(args) == 0 {
+		a.Next()
+		return
+	}
+
 	switch args[0] {
 	case "interview":
 		template, err := a.findTemplateBySummary("Interview")
@@ -98,7 +103,8 @@ func (a *App) findTemplateBySummary(summary string) (dstask.Task, error) {
 }
 
 func (a *App) Next() {
-	MustNotFail(dstask.CommandNext(a.Config, a.Context, a.Query))
+	state := dstask.LoadState(a.Config.StateFile)
+	MustNotFail(dstask.CommandNext(a.Config, state.Context, a.Query))
 }
 
 func (a *App) AddTask(t dstask.Task) {
