@@ -53,22 +53,7 @@ func (a *App) Execute(args []string) {
 
 	switch args[0] {
 	case "interview":
-		template, err := a.findTemplateBySummary("Interview")
-		if err != nil {
-			dstask.ExitFail(err.Error())
-		}
-
-		task := dstask.Task{
-			WritePending: true,
-			Status:       dstask.STATUS_PENDING,
-			Summary:      args[1],
-			Tags:         template.Tags,
-			Project:      template.Project,
-			Priority:     template.Priority,
-			Notes:        template.Notes,
-		}
-		a.AddTask(task)
-
+		a.createTaskFromTemplate(args[1], "Interview")
 	case "projects":
 		MustNotFail(dstask.CommandShowProjects(a.Config, a.Context, a.Query))
 	case "templates":
@@ -109,7 +94,25 @@ func (a *App) Next() {
 
 func (a *App) AddTask(t dstask.Task) {
 	ts := a.TS
-  t = ts.LoadTask(t)
+	t = ts.LoadTask(t)
 	ts.SavePendingChanges()
 	dstask.MustGitCommit(a.Config.Repo, "Added %s", t)
+}
+
+func (a *App) createTaskFromTemplate(summary string, templateSummary string) {
+	template, err := a.findTemplateBySummary(templateSummary)
+	if err != nil {
+		dstask.ExitFail(err.Error())
+	}
+
+	task := dstask.Task{
+		WritePending: true,
+		Status:       dstask.STATUS_PENDING,
+		Summary:      summary,
+		Tags:         template.Tags,
+		Project:      template.Project,
+		Priority:     template.Priority,
+		Notes:        template.Notes,
+	}
+	a.AddTask(task)
 }
