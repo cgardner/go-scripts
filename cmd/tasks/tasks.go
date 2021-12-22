@@ -54,6 +54,11 @@ func (a *App) Execute(args []string) {
 	switch args[0] {
 	case "interview":
 		a.createTaskFromTemplate(args[1], "Interview")
+	case "inbox", "in":
+		a.TS.FilterOrganised()
+		a.TS.DisplayByNext(a.Context, true)
+	case "new-hire":
+		a.createTaskFromTemplate(fmt.Sprintf("New Hire - %s", args[1]), "New Hire")
 	case "projects":
 		MustNotFail(dstask.CommandShowProjects(a.Config, a.Context, a.Query))
 	case "templates":
