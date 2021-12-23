@@ -14,22 +14,22 @@ type App struct {
 }
 
 func main() {
-  args := os.Args[1:]
+	args := os.Args[1:]
 
-  ledgerFile := ""
-  if len(args) >= 1 {
-    ledgerFile = args[0]
-  }
+	ledgerFile := ""
+	if len(args) >= 1 {
+		ledgerFile = args[0]
+	}
 
-  action := "help"
-  if len(args) >= 2 {
-    action = args[2]
-  }
+	action := "help"
+	if len(args) >= 2 {
+		action = args[2]
+	}
 
-  actionArgs := []string{}
-  if len(args) >= 3 {
-    actionArgs = args[3:]
-  }
+	actionArgs := []string{}
+	if len(args) >= 3 {
+		actionArgs = args[3:]
+	}
 
 	app := NewApp(ledgerFile)
 	app.Execute(action, actionArgs...)
@@ -59,7 +59,7 @@ func (a *App) Execute(action string, args ...string) {
 
 	command := ""
 
-  y, m, _ := time.Now().Date()
+	y, m, _ := time.Now().Date()
 	switch action {
 	case "copy":
 		entryName := args[0]
@@ -73,8 +73,8 @@ func (a *App) Execute(action string, args ...string) {
 	case "bal":
 		command = a.generateLedgerExecution("balance -C")
 	default:
-    defaultArgs := append([]string{action}, args...)
-    command = a.generateLedgerExecution(strings.Join(defaultArgs, " "))
+		defaultArgs := append([]string{action}, args...)
+		command = a.generateLedgerExecution(strings.Join(defaultArgs, " "))
 	}
 
 	script.Exec(command).Stdout()
