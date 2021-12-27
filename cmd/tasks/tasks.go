@@ -14,6 +14,8 @@ type App struct {
 	TS      *dstask.TaskSet
 }
 
+type CommandFunction func(dstask.Config, dstask.Query, dstask.Query) error
+
 func main() {
 	app := NewApp()
 	app.Execute(os.Args[1:])
@@ -81,8 +83,7 @@ func (a *App) Execute(args []string) {
 	case "list", "ls":
 		fallthrough
 	default:
-		a.Query = dstask.ParseQuery(args...)
-		a.Next()
+		a.DefaultCommand(args)
 	}
 }
 
@@ -129,4 +130,52 @@ func (a *App) createTaskFromTemplate(summary string, templateSummary string) dst
 	}
 	return task
 }
+
+func (a *App) DefaultCommand(args []string) {
+	/***
+	 * Tasks Not Covered Here:
+	 *  - Context
+   *  - Undo
+   *  - Sync
+   *  - Git
+   *  - Versions
+   *  - Completions
+	 */
+	commandMap := map[string]CommandFunction{
+		dstask.CMD_NEXT:             dstask.CommandNext,
+		dstask.CMD_SHOW_OPEN:        dstask.CommandShowOpen,
+		dstask.CMD_ADD:              dstask.CommandAdd,
+		dstask.CMD_RM:               dstask.CommandRemove,
+		dstask.CMD_REMOVE:           dstask.CommandRemove,
+		dstask.CMD_TEMPLATE:         dstask.CommandTemplate,
+		dstask.CMD_LOG:              dstask.CommandLog,
+		dstask.CMD_START:            dstask.CommandStart,
+		dstask.CMD_STOP:             dstask.CommandStop,
+		dstask.CMD_DONE:             dstask.CommandDone,
+		dstask.CMD_RESOLVE:          dstask.CommandDone,
+		dstask.CMD_MODIFY:           dstask.CommandModify,
+		dstask.CMD_EDIT:             dstask.CommandEdit,
+		dstask.CMD_NOTE:             dstask.CommandNote,
+		dstask.CMD_NOTES:            dstask.CommandNote,
+		dstask.CMD_SHOW_ACTIVE:      dstask.CommandShowActive,
+		dstask.CMD_SHOW_PAUSED:      dstask.CommandShowPaused,
+		dstask.CMD_OPEN:             dstask.CommandOpen,
+		dstask.CMD_SHOW_PROJECTS:    dstask.CommandShowProjects,
+		dstask.CMD_SHOW_TAGS:        dstask.CommandShowTags,
+		dstask.CMD_SHOW_TEMPLATES:   dstask.CommandShowTemplates,
+		dstask.CMD_SHOW_RESOLVED:    dstask.CommandShowResolved,
+		dstask.CMD_SHOW_UNORGANISED: dstask.CommandShowUnorganised,
+	}
+
+	a.Query = dstask.ParseQuery(args...)
+	state := dstask.LoadState(a.Config.StateFile)
+	query := dstask.ParseQuery(args...)
+
+	commandFunction, exists := commandMap[query.Cmd]
+
+	if query.Cmd == "" || !exists {
+		MustNotFail(dstask.CommandNext(a.Config, state.Context, query))
+	}
+
+	MustNotFail(commandFunction(a.Config, state.Context, query))
 }
