@@ -69,6 +69,12 @@ func (a *App) Execute(args []string) {
 		MustNotFail(dstask.CommandShowActive(a.Config, a.Context, a.Query))
 	case "paused":
 		MustNotFail(dstask.CommandShowPaused(a.Config, a.Context, a.Query))
+	case "lift":
+		summary := fmt.Sprintf("%s (%s lbs)", args[1], args[2])
+		task := a.createTaskFromTemplate(summary, "Lift")
+		task.Status = dstask.STATUS_RESOLVED
+		fmt.Println(task)
+		a.AddTask(task)
 	case "today":
 		a.Query.Tags = []string{"today"}
 		a.Next()
