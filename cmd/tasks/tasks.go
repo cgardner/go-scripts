@@ -53,12 +53,14 @@ func (a *App) Execute(args []string) {
 
 	switch args[0] {
 	case "interview":
-		a.createTaskFromTemplate(args[1], "Interview")
+		task := a.createTaskFromTemplate(args[1], "Interview")
+		a.AddTask(task)
 	case "inbox", "in":
 		a.TS.FilterOrganised()
 		a.TS.DisplayByNext(a.Context, true)
 	case "new-hire":
-		a.createTaskFromTemplate(fmt.Sprintf("New Hire - %s", args[1]), "New Hire")
+		task := a.createTaskFromTemplate(fmt.Sprintf("New Hire - %s", args[1]), "New Hire")
+		a.AddTask(task)
 	case "projects":
 		MustNotFail(dstask.CommandShowProjects(a.Config, a.Context, a.Query))
 	case "templates":
@@ -104,7 +106,7 @@ func (a *App) AddTask(t dstask.Task) {
 	dstask.MustGitCommit(a.Config.Repo, "Added %s", t)
 }
 
-func (a *App) createTaskFromTemplate(summary string, templateSummary string) {
+func (a *App) createTaskFromTemplate(summary string, templateSummary string) dstask.Task {
 	template, err := a.findTemplateBySummary(templateSummary)
 	if err != nil {
 		dstask.ExitFail(err.Error())
@@ -119,5 +121,6 @@ func (a *App) createTaskFromTemplate(summary string, templateSummary string) {
 		Priority:     template.Priority,
 		Notes:        template.Notes,
 	}
-	a.AddTask(task)
+	return task
+}
 }
