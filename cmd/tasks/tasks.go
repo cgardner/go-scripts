@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/naggie/dstask"
 )
@@ -75,6 +76,7 @@ func (a *App) Execute(args []string) {
 		summary := fmt.Sprintf("%s (%s lbs)", args[1], args[2])
 		task := a.createTaskFromTemplate(summary, "Lift")
 		task.Status = dstask.STATUS_RESOLVED
+		task.Resolved = time.Now()
 		fmt.Println(task)
 		a.AddTask(task)
 	case "today":
