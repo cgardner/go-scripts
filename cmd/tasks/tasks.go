@@ -133,14 +133,14 @@ func (a *App) createTaskFromTemplate(summary string, templateSummary string) dst
 
 func (a *App) DefaultCommand(args []string) {
 	/***
-	 * Tasks Not Covered Here:
-	 *  - Context
-   *  - Undo
-   *  - Sync
-   *  - Git
-   *  - Versions
-   *  - Completions
-	 */
+	  Tasks Not Covered Here:
+	    - Context
+	    - Undo
+	    - Sync
+	    - Git
+	    - Versions
+	    - Completions
+	*/
 	commandMap := map[string]CommandFunction{
 		dstask.CMD_NEXT:             dstask.CommandNext,
 		dstask.CMD_SHOW_OPEN:        dstask.CommandShowOpen,
